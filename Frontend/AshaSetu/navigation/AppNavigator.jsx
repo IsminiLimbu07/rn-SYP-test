@@ -1,0 +1,73 @@
+// frontend/src/navigation/AppNavigator.jsx
+import React, { useContext } from 'react';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { ActivityIndicator, View } from 'react-native';
+import { AuthContext } from '../context/AuthContext';
+
+// Import screens
+import WelcomeScreen from '../screens/WelcomeScreen';
+import LoginScreen from '../screens/LoginScreen';
+import RegisterScreen from '../screens/RegisterScreen';
+import ProfileScreen from '../screens/ProfileScreen';
+import EditProfileScreen from '../screens/EditProfileScreen';
+import ChangePasswordScreen from '../screens/ChangePasswordScreen';
+
+const Stack = createNativeStackNavigator();
+
+const AppNavigator = () => {
+  const { user, loading } = useContext(AuthContext);
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#007AFF" />
+      </View>
+    );
+  }
+
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: true }}>
+      {user ? (
+        // Authenticated Stack
+        <>
+          <Stack.Screen 
+            name="Profile" 
+            component={ProfileScreen}
+            options={{ title: 'My Profile' }}
+          />
+          <Stack.Screen 
+            name="EditProfile" 
+            component={EditProfileScreen}
+            options={{ title: 'Edit Profile' }}
+          />
+          <Stack.Screen 
+            name="ChangePassword" 
+            component={ChangePasswordScreen}
+            options={{ title: 'Change Password' }}
+          />
+        </>
+      ) : (
+        // Guest Stack
+        <>
+          <Stack.Screen 
+            name="Welcome" 
+            component={WelcomeScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen 
+            name="Login" 
+            component={LoginScreen}
+            options={{ title: 'Login' }}
+          />
+          <Stack.Screen 
+            name="Register" 
+            component={RegisterScreen}
+            options={{ title: 'Register' }}
+          />
+        </>
+      )}
+    </Stack.Navigator>
+  );
+};
+
+export default AppNavigator;
