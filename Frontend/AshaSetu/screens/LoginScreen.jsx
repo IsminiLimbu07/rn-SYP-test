@@ -9,7 +9,8 @@ import {
   Alert,
   ActivityIndicator,
   KeyboardAvoidingView,
-  Platform
+  Platform,
+  Image
 } from 'react-native';
 import { AuthContext } from '../context/AuthContext';
 import { loginUser } from '../api/auth';
@@ -19,32 +20,16 @@ const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState({});
-
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!email.trim()) {
-      newErrors.email = 'Email is required';
-    }
-
-    if (!password) {
-      newErrors.password = 'Password is required';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
 
   const handleLogin = async () => {
-    if (!validateForm()) {
+    if (!email.trim() || !password) {
+      Alert.alert('Error', 'Please fill in all fields');
       return;
     }
 
     setLoading(true);
     try {
       const response = await loginUser({ email, password });
-
       if (response.success) {
         await login(response.token, response.user);
       }
@@ -56,148 +41,226 @@ const LoginScreen = ({ navigation }) => {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <View style={styles.content}>
-        <Text style={styles.title}>Welcome Back</Text>
-        <Text style={styles.subtitle}>Login to your account</Text>
-
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Email</Text>
-          <TextInput
-            style={[styles.input, errors.email && styles.inputError]}
-            placeholder="Enter your email"
-            value={email}
-            onChangeText={(value) => {
-              setEmail(value);
-              if (errors.email) setErrors({ ...errors, email: null });
-            }}
-            keyboardType="email-address"
-            autoCapitalize="none"
+    <View style={styles.container}>
+      {/* Top Section with Logo - Beige Background */}
+      <View style={styles.topSection}>
+        {/* Logo Container */}
+        <View style={styles.logoContainer}>
+          {/* Logo Image */}
+          <Image
+            source={require('../assets/images/Logo.jpg')}
+            style={styles.logoImage}
+            resizeMode="contain"
           />
-          {errors.email && (
-            <Text style={styles.errorText}>{errors.email}</Text>
-          )}
         </View>
-
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Password</Text>
-          <TextInput
-            style={[styles.input, errors.password && styles.inputError]}
-            placeholder="Enter your password"
-            value={password}
-            onChangeText={(value) => {
-              setPassword(value);
-              if (errors.password) setErrors({ ...errors, password: null });
-            }}
-            secureTextEntry
-          />
-          {errors.password && (
-            <Text style={styles.errorText}>{errors.password}</Text>
-          )}
-        </View>
-
-        <TouchableOpacity
-          style={[styles.button, loading && styles.buttonDisabled]}
-          onPress={handleLogin}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.buttonText}>Login</Text>
-          )}
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.linkContainer}
-          onPress={() => navigation.navigate('Register')}
-        >
-          <Text style={styles.linkText}>
-            Don't have an account? <Text style={styles.link}>Register</Text>
-          </Text>
-        </TouchableOpacity>
       </View>
-    </KeyboardAvoidingView>
+
+      {/* Bottom Section with Form - Gradient Background */}
+      <View style={styles.bottomSection}>
+        {/* Welcome Card with Embedded Form */}
+        <View style={styles.welcomeCard}>
+          <Text style={styles.welcomeTitle}>WELCOME</Text>
+          <Text style={styles.welcomeSubtitle}>Hello, Login Back To Your Account</Text>
+          
+          {/* Email Input */}
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Email</Text>
+            <View style={styles.inputWrapper}>
+              <TextInput
+                style={styles.input}
+                placeholder="placeholder"
+                placeholderTextColor="rgba(255, 255, 255, 0.5)"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+              <Text style={styles.inputIcon}>✉</Text>
+            </View>
+          </View>
+
+          {/* Password Input */}
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Password</Text>
+            <View style={styles.inputWrapper}>
+              <TextInput
+                style={styles.input}
+                placeholder="placeholder"
+                placeholderTextColor="rgba(255, 255, 255, 0.5)"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+              />
+              <Text style={styles.inputIcon}>👁</Text>
+            </View>
+          </View>
+
+          <TouchableOpacity style={styles.forgotPassword}>
+            <Text style={styles.forgotPasswordText}>Forget Password?</Text>
+          </TouchableOpacity>
+
+          {/* Login Button */}
+          <TouchableOpacity
+            style={[styles.loginButton, loading && styles.loginButtonDisabled]}
+            onPress={handleLogin}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <>
+                <Text style={styles.loginButtonText}>Login</Text>
+                <Text style={styles.loginArrow}>→</Text>
+              </>
+            )}
+          </TouchableOpacity>
+        </View>
+
+        {/* Register Link */}
+        <View style={styles.registerSection}>
+          <Text style={styles.registerText}>Don't have an account? </Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+            <Text style={styles.registerLink}>SignUp</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff'
+    backgroundColor: '#F5E6D3'
   },
-  content: {
-    flex: 1,
-    padding: 20,
-    justifyContent: 'center'
+  topSection: {
+    flex: 0.4,
+    backgroundColor: '#F5E6D3',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 40
   },
-  title: {
-    fontSize: 32,
+  logoContainer: {
+    alignItems: 'center'
+  },
+  logoImage: {
+    width: 600,
+    height: 500
+  },
+  bottomSection: {
+    flex: 0.8,
+    backgroundColor: '#E8C5C5',
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    paddingTop: 30,
+
+  },
+  welcomeCard: {
+    backgroundColor: '#8B0000',
+    marginHorizontal: 20,
+    marginTop: -5,
+    paddingHorizontal: 25,
+    paddingTop: 30,
+    paddingBottom: 25,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 8
+  },
+  welcomeTitle: {
+    fontSize: 36,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 10,
+    color: '#fff',
+    letterSpacing: 3,
+    marginBottom: 8,
     textAlign: 'center'
   },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 40,
-    textAlign: 'center'
+  welcomeSubtitle: {
+    fontSize: 13,
+    color: 'rgba(255, 255, 255, 0.8)',
+    textAlign: 'center',
+    marginBottom: 25
   },
-  inputContainer: {
-    marginBottom: 20
+  inputGroup: {
+    marginBottom: 18
   },
   label: {
-    fontSize: 16,
-    color: '#333',
+    fontSize: 13,
+    color: '#fff',
     marginBottom: 8,
     fontWeight: '500'
   },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.2)',
     borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: '#f9f9f9'
+    paddingHorizontal: 12
   },
-  inputError: {
-    borderColor: '#ff3b30'
-  },
-  errorText: {
-    color: '#ff3b30',
+  input: {
+    flex: 1,
+    paddingVertical: 12,
     fontSize: 14,
+    color: '#fff'
+  },
+  inputIcon: {
+    fontSize: 18,
+    color: 'rgba(255, 255, 255, 0.6)',
+    marginLeft: 8
+  },
+  forgotPassword: {
+    alignSelf: 'flex-end',
+    marginTop: 5,
+    marginBottom: 20
+  },
+  forgotPasswordText: {
+    color: 'rgba(255, 255, 255, 0.9)',
+    fontSize: 12,
+    fontWeight: '500'
+  },
+  loginButton: {
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    paddingVertical: 14,
+    borderRadius: 10,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginTop: 5
   },
-  button: {
-    backgroundColor: '#007AFF',
-    paddingVertical: 15,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 10
+  loginButtonDisabled: {
+    backgroundColor: '#B8B8B8'
   },
-  buttonDisabled: {
-    backgroundColor: '#a0c4ff'
-  },
-  buttonText: {
+  loginButtonText: {
     color: '#fff',
     fontSize: 18,
-    fontWeight: '600'
+    fontWeight: 'bold',
+    marginRight: 8
   },
-  linkContainer: {
+  loginArrow: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: 'bold'
+  },
+  registerSection: {
+    flexDirection: 'row',
+    justifyContent: 'center',
     marginTop: 20,
-    alignItems: 'center'
+    paddingBottom: 20
   },
-  linkText: {
-    fontSize: 16,
-    color: '#666'
+  registerText: {
+    fontSize: 14,
+    color: '#5C0000'
   },
-  link: {
-    color: '#007AFF',
-    fontWeight: '600'
+  registerLink: {
+    fontSize: 14,
+    color: '#8B0000',
+    fontWeight: 'bold',
+    textDecorationLine: 'underline'
   }
 });
 
